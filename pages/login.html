@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siscar — Login</title>
+  <meta name="description" content="Acesse o painel do Siscar para gerenciar sua loja de veículos.">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+
+  <div class="login-card">
+    <a href="../index.html" class="login-logo">
+      <div class="logo-icon">🚗</div>
+      <span>Sis<span style="color:var(--primary)">car</span></span>
+    </a>
+
+    <h2 class="login-title">Seja bem-vindo de volta!</h2>
+    <p class="login-subtitle">Acesse sua conta para gerenciar seu estoque e vendas.</p>
+
+    <form class="login-form" id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="login-email">E-mail</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">📧</span>
+          <input type="email" id="login-email" class="form-input" placeholder="seuemail@exemplo.com" required value="admin@siscar.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2px;">
+          <label class="form-label" for="login-password" style="margin-bottom:0;">Senha</label>
+          <span class="login-forgot" id="forgot-password">Esqueceu a senha?</span>
+        </div>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔒</span>
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required value="123456">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full" style="justify-content:center; margin-top:8px;">
+        Entrar no Painel 🚀
+      </button>
+    </form>
+
+    <div style="margin-top: 24px;">
+      <div class="login-divider">ou acesse como</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px;">
+        <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('carlos@siscar.com')">🔑 Vendedor</button>
+        <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('joao@siscar.com')">🔑 Gerente</button>
+      </div>
+    </div>
+
+    <p class="login-register">
+      Ainda não tem conta? <a href="../index.html#contato">Teste grátis por 15 dias</a>
+    </p>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script>
+  document.getElementById('login-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email')?.value;
+    const password = document.getElementById('login-password')?.value;
+
+    if (email && password) {
+      // Find user
+      const users = [
+        { email: 'admin@siscar.com', name: 'Admin Sistema', role: 'admin' },
+        { email: 'carlos@siscar.com', name: 'Carlos Vendedor', role: 'vendedor' },
+        { email: 'maria@siscar.com', name: 'Maria Vendedora', role: 'vendedor' },
+        { email: 'joao@siscar.com', name: 'João Gerente', role: 'gerente' }
+      ];
+
+      const user = users.find(u => u.email === email.toLowerCase());
+      if (user) {
+        // Save current logged in user to localStorage
+        localStorage.setItem('siscar_current_user', JSON.stringify(user));
+        Toast.success('Login realizado!', `Bem-vindo, ${user.name}! Redirecionando...`);
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1200);
+      } else {
+        Toast.error('Erro de login', 'Usuário ou senha inválidos.');
+      }
+    }
+  });
+
+  function quickLogin(email) {
+    const emailInput = document.getElementById('login-email');
+    const passInput = document.getElementById('login-password');
+    if (emailInput && passInput) {
+      emailInput.value = email;
+      passInput.value = '123456';
+      document.getElementById('login-form').dispatchEvent(new Event('submit'));
+    }
+  }
+
+  document.getElementById('forgot-password')?.addEventListener('click', () => {
+    Toast.info('Recuperação de Senha', 'Um link de redefinição foi enviado para o seu e-mail cadastrado.');
+  });
+</script>
+</body>
+</html>

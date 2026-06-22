@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siscar — Gestão Financeira</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body data-page="financeiro">
+
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <div class="logo-icon">🚗</div>
+        <span>Sis<span class="brand-accent">car</span></span>
+      </a>
+      <button class="sidebar-close">✕</button>
+    </div>
+
+    <div class="sidebar-store">
+      <div class="store-avatar">SV</div>
+      <div class="user-info">
+        <div class="store-name">Siscar Veículos</div>
+        <div class="store-plan">Plano Pro ★</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section-label">Operação</div>
+      <a href="estoque.html" class="nav-item">
+        <span class="nav-icon">🚗</span>
+        <span>Estoque</span>
+      </a>
+      <a href="clientes.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Clientes (CRM)</span>
+      </a>
+      <a href="vendas.html" class="nav-item">
+        <span class="nav-icon">💰</span>
+        <span>Vendas</span>
+      </a>
+      <a href="financeiro.html" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span>Financeiro</span>
+      </a>
+
+      <div class="nav-section-label">Ferramentas</div>
+      <a href="contratos.html" class="nav-item">
+        <span class="nav-icon">📄</span>
+        <span>Contratos</span>
+      </a>
+      <a href="avaliacoes.html" class="nav-item">
+        <span class="nav-icon">⭐</span>
+        <span>Avaliação Pro</span>
+      </a>
+      <a href="vistoria.html" class="nav-item">
+        <span class="nav-icon">🔍</span>
+        <span>Vistoria</span>
+      </a>
+      <a href="integrador.html" class="nav-item">
+        <span class="nav-icon">🌐</span>
+        <span>Integrador</span>
+      </a>
+
+      <div class="nav-section-label">Gestão</div>
+      <a href="relatorios.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Relatórios</span>
+      </a>
+      <a href="configuracoes.html" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>Configurações</span>
+      </a>
+      <a href="usuarios.html" class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span>Usuários</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar avatar-sm" id="sidebar-user-avatar">AD</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Admin</div>
+          <div class="user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+        <div class="user-logout" onclick="logout()" title="Sair">🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle">☰</button>
+        <div class="breadcrumb">
+          <a href="dashboard.html">Admin</a> / <span>Financeiro</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" title="Notificações">
+          🔔<span class="notif-badge"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <header class="page-header">
+        <div class="page-header-left">
+          <h1>Gestão Financeira</h1>
+          <p>Fluxo de caixa, receitas, despesas e comissões.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-add-financial">➕ Lançamento</button>
+        </div>
+      </header>
+
+      <!-- KPI Summary -->
+      <div class="financial-summary">
+        <div class="fin-card receita">
+          <div class="fin-card-label">Receitas</div>
+          <div class="fin-card-value" id="fin-receita">R$ 0,00</div>
+        </div>
+        <div class="fin-card despesa">
+          <div class="fin-card-label">Despesas</div>
+          <div class="fin-card-value" id="fin-despesa">R$ 0,00</div>
+        </div>
+        <div class="fin-card saldo">
+          <div class="fin-card-label">Saldo</div>
+          <div class="fin-card-value" id="fin-saldo">R$ 0,00</div>
+        </div>
+      </div>
+
+      <!-- Cashflow chart -->
+      <div class="chart-card mb-24">
+        <div class="chart-card-header">
+          <h2 class="chart-title">Fluxo de Caixa</h2>
+          <div class="chart-subtitle">Análise histórica de receitas e despesas</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="cashflow-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Financial Table -->
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Categoria</th>
+              <th>Descrição</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="financials-tbody">
+            <!-- Rendered dynamically by js/dashboard.js -->
+            <tr>
+              <td colspan="7" class="text-center">Carregando fluxo financeiro...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Financial Form -->
+<div class="modal-overlay" id="modal-financial">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Novo Lançamento</h3>
+      <button class="modal-close" onclick="Modal.close('modal-financial')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-financial" class="login-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="f-type">Tipo de Lançamento *</label>
+            <select id="f-type" class="form-select" required>
+              <option value="receita">Receita (Entrada)</option>
+              <option value="despesa">Despesa (Saída)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-category">Categoria</label>
+            <select id="f-category" class="form-select">
+              <option value="Venda de Veículo">Venda de Veículo</option>
+              <option value="Manutenção">Manutenção</option>
+              <option value="Aluguel">Aluguel</option>
+              <option value="Funcionários">Funcionários</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-desc">Descrição / Detalhe *</label>
+          <input type="text" id="f-desc" class="form-input" placeholder="Ex: Venda de Veículo Honda Civic" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="f-amount">Valor (R$) *</label>
+            <input type="number" id="f-amount" class="form-input" placeholder="Ex: 1200" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-date">Data</label>
+            <input type="date" id="f-date" class="form-input">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="Modal.close('modal-financial')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-financial">Salvar Lançamento</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  // Profile loading and logout function
+  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
+  if (currentUser) {
+    document.getElementById('sidebar-user-name').textContent = currentUser.name;
+    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
+    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+  }
+
+  function logout() {
+    localStorage.removeItem('siscar_current_user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body>
+</html>

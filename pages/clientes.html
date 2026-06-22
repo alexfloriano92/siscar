@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siscar — Clientes (CRM)</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body data-page="clientes">
+
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <div class="logo-icon">🚗</div>
+        <span>Sis<span class="brand-accent">car</span></span>
+      </a>
+      <button class="sidebar-close">✕</button>
+    </div>
+
+    <div class="sidebar-store">
+      <div class="store-avatar">SV</div>
+      <div class="user-info">
+        <div class="store-name">Siscar Veículos</div>
+        <div class="store-plan">Plano Pro ★</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section-label">Operação</div>
+      <a href="estoque.html" class="nav-item">
+        <span class="nav-icon">🚗</span>
+        <span>Estoque</span>
+      </a>
+      <a href="clientes.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Clientes (CRM)</span>
+      </a>
+      <a href="vendas.html" class="nav-item">
+        <span class="nav-icon">💰</span>
+        <span>Vendas</span>
+      </a>
+      <a href="financeiro.html" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span>Financeiro</span>
+      </a>
+
+      <div class="nav-section-label">Ferramentas</div>
+      <a href="contratos.html" class="nav-item">
+        <span class="nav-icon">📄</span>
+        <span>Contratos</span>
+      </a>
+      <a href="avaliacoes.html" class="nav-item">
+        <span class="nav-icon">⭐</span>
+        <span>Avaliação Pro</span>
+      </a>
+      <a href="vistoria.html" class="nav-item">
+        <span class="nav-icon">🔍</span>
+        <span>Vistoria</span>
+      </a>
+      <a href="integrador.html" class="nav-item">
+        <span class="nav-icon">🌐</span>
+        <span>Integrador</span>
+      </a>
+
+      <div class="nav-section-label">Gestão</div>
+      <a href="relatorios.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Relatórios</span>
+      </a>
+      <a href="configuracoes.html" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>Configurações</span>
+      </a>
+      <a href="usuarios.html" class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span>Usuários</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar avatar-sm" id="sidebar-user-avatar">AD</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Admin</div>
+          <div class="user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+        <div class="user-logout" onclick="logout()" title="Sair">🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle">☰</button>
+        <div class="breadcrumb">
+          <a href="dashboard.html">Admin</a> / <span>Clientes</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" title="Notificações">
+          🔔<span class="notif-badge"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <header class="page-header">
+        <div class="page-header-left">
+          <h1>Clientes (CRM)</h1>
+          <p>Gerencie os contatos, leads e histórico de compras dos seus clientes.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-add-client">➕ Novo Cliente</button>
+        </div>
+      </header>
+
+      <!-- Toolbar -->
+      <div class="page-toolbar">
+        <div class="toolbar-left">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="client-search" class="form-input" placeholder="Buscar por nome, CPF, telefone...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Clients Table -->
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Telefone</th>
+              <th>E-mail</th>
+              <th>Localidade</th>
+              <th>Compras</th>
+              <th>Total Gasto</th>
+              <th>Última Compra</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="clients-tbody">
+            <!-- Rendered dynamically by js/dashboard.js -->
+            <tr>
+              <td colspan="8" class="text-center">Carregando clientes...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Client Form -->
+<div class="modal-overlay" id="modal-client">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Novo Cliente</h3>
+      <button class="modal-close" onclick="Modal.close('modal-client')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-client" class="login-form">
+        <div class="form-group">
+          <label class="form-label" for="c-name">Nome Completo *</label>
+          <input type="text" id="c-name" class="form-input" placeholder="Ex: João Silva Santos" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="c-cpf">CPF / CNPJ</label>
+            <input type="text" id="c-cpf" class="form-input" placeholder="Ex: 123.456.789-00">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-phone">Telefone / WhatsApp *</label>
+            <input type="text" id="c-phone" class="form-input" placeholder="Ex: (11) 98765-4321" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="c-email">E-mail</label>
+          <input type="email" id="c-email" class="form-input" placeholder="Ex: joao.silva@email.com">
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="c-city">Cidade</label>
+            <input type="text" id="c-city" class="form-input" placeholder="Ex: São Paulo">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-state">Estado (UF)</label>
+            <input type="text" id="c-state" class="form-input" placeholder="Ex: SP" maxlength="2">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="Modal.close('modal-client')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-client">Salvar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  // Profile loading and logout function
+  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
+  if (currentUser) {
+    document.getElementById('sidebar-user-name').textContent = currentUser.name;
+    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
+    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+  }
+
+  function logout() {
+    localStorage.removeItem('siscar_current_user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body>
+</html>

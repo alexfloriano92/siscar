@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siscar — Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body data-page="dashboard">
+
+<div class="app-layout">
+  <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <div class="logo-icon">🚗</div>
+        <span>Sis<span class="brand-accent">car</span></span>
+      </a>
+      <button class="sidebar-close">✕</button>
+    </div>
+
+    <div class="sidebar-store">
+      <div class="store-avatar">SV</div>
+      <div class="user-info">
+        <div class="store-name">Siscar Veículos</div>
+        <div class="store-plan">Plano Pro ★</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section-label">Operação</div>
+      <a href="estoque.html" class="nav-item">
+        <span class="nav-icon">🚗</span>
+        <span>Estoque</span>
+      </a>
+      <a href="clientes.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Clientes (CRM)</span>
+      </a>
+      <a href="vendas.html" class="nav-item">
+        <span class="nav-icon">💰</span>
+        <span>Vendas</span>
+      </a>
+      <a href="financeiro.html" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span>Financeiro</span>
+      </a>
+
+      <div class="nav-section-label">Ferramentas</div>
+      <a href="contratos.html" class="nav-item">
+        <span class="nav-icon">📄</span>
+        <span>Contratos</span>
+      </a>
+      <a href="avaliacoes.html" class="nav-item">
+        <span class="nav-icon">⭐</span>
+        <span>Avaliação Pro</span>
+      </a>
+      <a href="vistoria.html" class="nav-item">
+        <span class="nav-icon">🔍</span>
+        <span>Vistoria</span>
+      </a>
+      <a href="integrador.html" class="nav-item">
+        <span class="nav-icon">🌐</span>
+        <span>Integrador</span>
+      </a>
+
+      <div class="nav-section-label">Gestão</div>
+      <a href="relatorios.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Relatórios</span>
+      </a>
+      <a href="configuracoes.html" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>Configurações</span>
+      </a>
+      <a href="usuarios.html" class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span>Usuários</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar avatar-sm" id="sidebar-user-avatar">AD</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Admin</div>
+          <div class="user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+        <div class="user-logout" onclick="logout()" title="Sair">🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ────────────────────────────────────────────── -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle">☰</button>
+        <div class="breadcrumb">
+          <a href="#">Admin</a> / <span>Dashboard</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon">🔍</span>
+          <input type="text" placeholder="Buscar por placa, modelo...">
+        </div>
+
+        <button class="topbar-icon-btn" title="Notificações">
+          🔔
+          <span class="notif-badge"></span>
+        </button>
+
+        <a href="configuracoes.html" class="topbar-icon-btn" title="Configurações">
+          ⚙️
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <header class="page-header">
+        <div class="page-header-left">
+          <h1>Olá, <span id="welcome-name">Administrador</span></h1>
+          <p>Veja os dados gerais da sua loja para o dia de hoje.</p>
+        </div>
+        <div class="page-header-actions">
+          <a href="estoque.html" class="btn btn-primary btn-sm">➕ Cadastrar Veículo</a>
+          <a href="vendas.html" class="btn btn-secondary btn-sm">💰 Nova Venda</a>
+        </div>
+      </header>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid" id="kpi-grid">
+        <!-- Rendered by js/dashboard.js -->
+        <div class="kpi-card skeleton" style="height:140px;"></div>
+        <div class="kpi-card skeleton" style="height:140px;"></div>
+        <div class="kpi-card skeleton" style="height:140px;"></div>
+        <div class="kpi-card skeleton" style="height:140px;"></div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Desempenho de Vendas</h2>
+              <div class="chart-subtitle">Faturamento e volume mensal de vendas</div>
+            </div>
+            <div class="chart-filters">
+              <button class="chart-filter-btn active">Semestre</button>
+              <button class="chart-filter-btn">Ano</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="sales-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Estoque por Tipo</h2>
+              <div class="chart-subtitle">Distribuição das categorias</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="stock-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Details -->
+      <div class="dashboard-grid-3">
+        <!-- Recent Activity -->
+        <div class="chart-card" style="grid-column: span 2;">
+          <div class="chart-card-header">
+            <h2 class="chart-title">Estoque Destaque</h2>
+            <div class="chart-subtitle">Veículos recentes e mais visitados</div>
+          </div>
+          <div class="activity-list" id="top-vehicles">
+            <!-- Rendered by js/dashboard.js -->
+          </div>
+        </div>
+
+        <!-- Latest activities -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h2 class="chart-title">Atividades Recentes</h2>
+            <div class="chart-subtitle">Logs de auditoria em tempo real</div>
+          </div>
+          <div class="activity-list" id="activity-list">
+            <!-- Rendered by js/dashboard.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  // Auth checks & load current user
+  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
+  if (currentUser) {
+    document.getElementById('welcome-name').textContent = currentUser.name.split(' ')[0];
+    document.getElementById('sidebar-user-name').textContent = currentUser.name;
+    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
+    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+  }
+
+  function logout() {
+    localStorage.removeItem('siscar_current_user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body>
+</html>

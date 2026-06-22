@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siscar — Configurações da Loja</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body data-page="configuracoes">
+
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <div class="logo-icon">🚗</div>
+        <span>Sis<span class="brand-accent">car</span></span>
+      </a>
+      <button class="sidebar-close">✕</button>
+    </div>
+
+    <div class="sidebar-store">
+      <div class="store-avatar">SV</div>
+      <div class="user-info">
+        <div class="store-name">Siscar Veículos</div>
+        <div class="store-plan">Plano Pro ★</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section-label">Operação</div>
+      <a href="estoque.html" class="nav-item">
+        <span class="nav-icon">🚗</span>
+        <span>Estoque</span>
+      </a>
+      <a href="clientes.html" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Clientes (CRM)</span>
+      </a>
+      <a href="vendas.html" class="nav-item">
+        <span class="nav-icon">💰</span>
+        <span>Vendas</span>
+      </a>
+      <a href="financeiro.html" class="nav-item">
+        <span class="nav-icon">📈</span>
+        <span>Financeiro</span>
+      </a>
+
+      <div class="nav-section-label">Ferramentas</div>
+      <a href="contratos.html" class="nav-item">
+        <span class="nav-icon">📄</span>
+        <span>Contratos</span>
+      </a>
+      <a href="avaliacoes.html" class="nav-item">
+        <span class="nav-icon">⭐</span>
+        <span>Avaliação Pro</span>
+      </a>
+      <a href="vistoria.html" class="nav-item">
+        <span class="nav-icon">🔍</span>
+        <span>Vistoria</span>
+      </a>
+      <a href="integrador.html" class="nav-item">
+        <span class="nav-icon">🌐</span>
+        <span>Integrador</span>
+      </a>
+
+      <div class="nav-section-label">Gestão</div>
+      <a href="relatorios.html" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Relatórios</span>
+      </a>
+      <a href="configuracoes.html" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>Configurações</span>
+      </a>
+      <a href="usuarios.html" class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span>Usuários</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar avatar-sm" id="sidebar-user-avatar">AD</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Admin</div>
+          <div class="user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+        <div class="user-logout" onclick="logout()" title="Sair">🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle">☰</button>
+        <div class="breadcrumb">
+          <a href="dashboard.html">Admin</a> / <span>Configurações</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" title="Notificações">
+          🔔<span class="notif-badge"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <header class="page-header">
+        <div class="page-header-left">
+          <h1>Configurações da Loja</h1>
+          <p>Gerencie os dados e parâmetros gerais do Siscar para a sua loja.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-save-config">💾 Salvar Configurações</button>
+        </div>
+      </header>
+
+      <!-- Configurations form layout -->
+      <div class="chart-card">
+        <form id="form-config" class="login-form">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="cfg-name">Razão Social / Nome de Exibição *</label>
+              <input type="text" id="cfg-name" class="form-input" placeholder="Ex: Siscar Veículos Ltda" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cfg-cnpj">CNPJ *</label>
+              <input type="text" id="cfg-cnpj" class="form-input" placeholder="Ex: 12.345.678/0001-90" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cfg-address">Endereço Físico *</label>
+            <input type="text" id="cfg-address" class="form-input" placeholder="Ex: Av. Paulista, 1000 - São Paulo/SP" required>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label" for="cfg-phone">Telefone Fixo</label>
+              <input type="text" id="cfg-phone" class="form-input" placeholder="Ex: (11) 3456-7890">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cfg-whatsapp">WhatsApp *</label>
+              <input type="text" id="cfg-whatsapp" class="form-input" placeholder="Ex: (11) 99999-9999" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cfg-commission">Comissão Venda Padrão (%)</label>
+              <input type="number" id="cfg-commission" class="form-input" placeholder="Ex: 3" value="3">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="cfg-email">E-mail Principal de Contato *</label>
+              <input type="email" id="cfg-email" class="form-input" placeholder="Ex: contato@sualoja.com.br" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cfg-website">Website Oficial</label>
+              <input type="url" id="cfg-website" class="form-input" placeholder="Ex: www.sualoja.com.br">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  // Profile loading and logout function
+  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
+  if (currentUser) {
+    document.getElementById('sidebar-user-name').textContent = currentUser.name;
+    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
+    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+  }
+
+  function logout() {
+    localStorage.removeItem('siscar_current_user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body>
+</html>
