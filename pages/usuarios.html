@@ -155,7 +155,7 @@
 <div class="modal-overlay" id="modal-user">
   <div class="modal">
     <div class="modal-header">
-      <h3 class="modal-title">Novo Usuário</h3>
+      <h3 class="modal-title" id="modal-user-title">Novo Usuário</h3>
       <button class="modal-close" onclick="Modal.close('modal-user')">✕</button>
     </div>
     <div class="modal-body">
@@ -165,9 +165,15 @@
           <input type="text" id="u-name" class="form-input" placeholder="Ex: Carlos Vendedor" required>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="u-email">E-mail de Login *</label>
-          <input type="email" id="u-email" class="form-input" placeholder="Ex: carlos@sualoja.com" required>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="u-email">E-mail de Login *</label>
+            <input type="email" id="u-email" class="form-input" placeholder="Ex: carlos@sualoja.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="u-password">Senha de Acesso *</label>
+            <input type="password" id="u-password" class="form-input" placeholder="Defina a senha" required>
+          </div>
         </div>
 
         <div class="form-grid-2">
@@ -185,35 +191,59 @@
           </div>
         </div>
 
-        <!-- Permissions Check table -->
-        <div style="margin-top: 16px;">
-          <label class="form-label" style="display:block; margin-bottom:8px;">Permissões Padrão do Cargo</label>
-          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom: 12px;">As permissões serão associadas automaticamente com base no cargo selecionado.</p>
+        <!-- Permissions Check Grid -->
+        <div style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 16px;">
+          <label class="form-label" style="display:block; margin-bottom:8px;">Permissões de Acesso</label>
+          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom: 16px;">
+            Personalize as áreas do sistema que este usuário terá permissão de acessar.
+          </p>
+          <div class="form-grid-3" style="gap: 12px; font-size: 0.85rem;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="estoque"> Estoque
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="clientes"> Clientes (CRM)
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="vendas"> Vendas
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="financeiro"> Financeiro
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="contratos"> Contratos
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="avaliacoes"> Avaliação Pro
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="vistoria"> Vistoria
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="integrador"> Integrador
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="relatorios"> Relatórios
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="configuracoes"> Configurações
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" class="perm-check" data-perm="usuarios"> Usuários
+            </label>
+          </div>
         </div>
       </form>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="Modal.close('modal-user')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-save-user">Cadastrar Usuário</button>
+      <button class="btn btn-primary" id="btn-save-user">Salvar Usuário</button>
     </div>
   </div>
 </div>
 
 <script src="../js/app.js"></script>
+<script src="../js/db.js"></script>
 <script src="../js/dashboard.js"></script>
-<script>
-  // Profile loading and logout function
-  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
-  if (currentUser) {
-    document.getElementById('sidebar-user-name').textContent = currentUser.name;
-    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
-    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-  }
-
-  function logout() {
-    localStorage.removeItem('siscar_current_user');
-    window.location.href = 'login.html';
-  }
-</script>
 </body>
 </html>

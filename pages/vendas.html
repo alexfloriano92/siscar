@@ -220,20 +220,7 @@
 </div>
 
 <script src="../js/app.js"></script>
+<script src="../js/db.js"></script>
 <script src="../js/dashboard.js"></script>
-<script>
-  // Profile loading and logout function
-  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
-  if (currentUser) {
-    document.getElementById('sidebar-user-name').textContent = currentUser.name;
-    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
-    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-  }
-
-  function logout() {
-    localStorage.removeItem('siscar_current_user');
-    window.location.href = 'login.html';
-  }
-</script>
 </body>
 </html>

@@ -175,11 +175,17 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="e-client">Nome do Cliente *</label>
-          <input type="text" id="e-client" class="form-input" placeholder="Ex: Ana Paula Rodrigues" required>
+          <label class="form-label" for="e-client">Cliente *</label>
+          <select id="e-client" class="form-select" required>
+            <option value="">Selecione o cliente...</option>
+          </select>
         </div>
 
         <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="e-date">Data da Avaliação</label>
+            <input type="date" id="e-date" class="form-input">
+          </div>
           <div class="form-group">
             <label class="form-label" for="e-fipe">Preço Tabela FIPE (R$)</label>
             <input type="number" id="e-fipe" class="form-input" placeholder="Ex: 35000">
@@ -204,20 +210,7 @@
 </div>
 
 <script src="../js/app.js"></script>
+<script src="../js/db.js"></script>
 <script src="../js/dashboard.js"></script>
-<script>
-  // Profile loading and logout function
-  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
-  if (currentUser) {
-    document.getElementById('sidebar-user-name').textContent = currentUser.name;
-    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
-    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-  }
-
-  function logout() {
-    localStorage.removeItem('siscar_current_user');
-    window.location.href = 'login.html';
-  }
-</script>
 </body>
 </html>

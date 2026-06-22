@@ -40,16 +40,26 @@
         <div class="form-input-wrap">
           <span class="form-input-icon">🔒</span>
           <input type="password" id="login-password" class="form-input" placeholder="••••••••" required value="123456">
+          <span class="form-input-icon" id="toggle-password" style="cursor:pointer;right:0;left:auto;padding-right:12px;" onclick="togglePasswordVisibility()">👁</span>
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary w-full" style="justify-content:center; margin-top:8px;">
-        Entrar no Painel 🚀
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <input type="checkbox" id="remember-me" style="width:16px;height:16px;cursor:pointer;">
+        <label for="remember-me" style="font-size:0.85rem;color:var(--text-secondary);cursor:pointer;">Lembrar-me por 30 dias</label>
+      </div>
+
+      <div id="login-error" style="display:none;padding:10px 14px;background:rgba(226,36,70,0.1);border:1px solid rgba(226,36,70,0.3);border-radius:8px;color:#E22446;font-size:0.85rem;margin-bottom:12px;">
+        ❌ <span id="login-error-msg">Usuário ou senha inválidos.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full" id="btn-login" style="justify-content:center; margin-top:8px;">
+        <span id="login-btn-text">Entrar no Painel 🚀</span>
       </button>
     </form>
 
     <div style="margin-top: 24px;">
-      <div class="login-divider">ou acesse como</div>
+      <div class="login-divider">ou acesse como demonstração</div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px;">
         <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('carlos@siscar.com')">🔑 Vendedor</button>
         <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('joao@siscar.com')">🔑 Gerente</button>
@@ -63,32 +73,51 @@
 </div>
 
 <script src="../js/app.js"></script>
+<script src="../js/db.js"></script>
 <script>
-  document.getElementById('login-form')?.addEventListener('submit', (e) => {
+  // Se já tem sessão, redireciona
+  window.addEventListener('siscar-db-ready', async () => {
+    const session = Auth.getSession();
+    if (session) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+  });
+
+  document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email')?.value;
+    const email = document.getElementById('login-email')?.value?.trim()?.toLowerCase();
     const password = document.getElementById('login-password')?.value;
+    const btn = document.getElementById('btn-login');
+    const btnText = document.getElementById('login-btn-text');
+    const errorEl = document.getElementById('login-error');
+    const errorMsg = document.getElementById('login-error-msg');
 
-    if (email && password) {
-      // Find user
-      const users = [
-        { email: 'admin@siscar.com', name: 'Admin Sistema', role: 'admin' },
-        { email: 'carlos@siscar.com', name: 'Carlos Vendedor', role: 'vendedor' },
-        { email: 'maria@siscar.com', name: 'Maria Vendedora', role: 'vendedor' },
-        { email: 'joao@siscar.com', name: 'João Gerente', role: 'gerente' }
-      ];
+    btn.disabled = true;
+    btnText.textContent = 'Entrando...';
+    errorEl.style.display = 'none';
 
-      const user = users.find(u => u.email === email.toLowerCase());
+    // Wait for DB
+    const tryLogin = async () => {
+      const user = await SiscarDB.loginUser(email, password);
       if (user) {
-        // Save current logged in user to localStorage
-        localStorage.setItem('siscar_current_user', JSON.stringify(user));
-        Toast.success('Login realizado!', `Bem-vindo, ${user.name}! Redirecionando...`);
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 1200);
+        Auth.setSession(user);
+        // Legacy support
+        localStorage.setItem('siscar_current_user', JSON.stringify({ name: user.name, email: user.email, role: user.role }));
+        Toast.success('Login realizado!', `Bem-vindo, ${user.name}! 🎉`);
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
       } else {
-        Toast.error('Erro de login', 'Usuário ou senha inválidos.');
+        btn.disabled = false;
+        btnText.textContent = 'Entrar no Painel 🚀';
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'E-mail ou senha inválidos. Verifique e tente novamente.';
       }
+    };
+
+    if (window.SiscarDB) {
+      await tryLogin();
+    } else {
+      window.addEventListener('siscar-db-ready', tryLogin, { once: true });
     }
   });
 
@@ -102,8 +131,13 @@
     }
   }
 
+  function togglePasswordVisibility() {
+    const passInput = document.getElementById('login-password');
+    passInput.type = passInput.type === 'password' ? 'text' : 'password';
+  }
+
   document.getElementById('forgot-password')?.addEventListener('click', () => {
-    Toast.info('Recuperação de Senha', 'Um link de redefinição foi enviado para o seu e-mail cadastrado.');
+    Toast.info('Recuperação de Senha', 'Entre em contato: contato@siscar.com.br ou (11) 99999-9999');
   });
 </script>
 </body>

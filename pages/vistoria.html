@@ -126,30 +126,56 @@
         </div>
       </header>
 
+      <!-- Dados do Veículo para Vistoria -->
+      <div class="chart-card mb-24">
+        <div class="chart-card-header">
+          <h2 class="chart-title">Dados do Veículo</h2>
+          <div class="chart-subtitle">Selecione o veículo em estoque ou digite a placa</div>
+        </div>
+        <div style="padding: 24px;">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="vistoria-vehicle">Veículo em Estoque</label>
+              <select id="vistoria-vehicle" class="form-select">
+                <option value="">Selecione (opcional)...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="vistoria-plate">Placa *</label>
+              <input type="text" id="vistoria-plate" class="form-input" placeholder="Ex: ABC-1234" required>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 16px;">
+            <label class="form-label" for="vistoria-obs">Observações Gerais</label>
+            <textarea id="vistoria-obs" class="form-textarea" placeholder="Observações e detalhes técnicos da vistoria..."></textarea>
+          </div>
+        </div>
+      </div>
+
       <!-- Checklist -->
       <div class="checklist">
         <!-- Lataria e Pintura -->
         <div class="checklist-group">
           <div class="checklist-group-header">🚗 Lataria & Pintura</div>
           <div class="checklist-items">
-            <div class="checklist-item">
-              <span class="checklist-item-label">Para-choque Dianteiro</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Para-choque Dianteiro</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
                 <button class="check-option problem">Problema</button>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-item-label">Capô e Painel Dianteiro</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Capô e Painel Dianteiro</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
                 <button class="check-option problem">Problema</button>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-item-label">Portas e Laterais</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Portas e Laterais</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
@@ -163,24 +189,24 @@
         <div class="checklist-group">
           <div class="checklist-group-header">⚙️ Mecânica & Elétrica</div>
           <div class="checklist-items">
-            <div class="checklist-item">
-              <span class="checklist-item-label">Nível de Óleo e Vazamentos</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Nível de Óleo e Vazamentos</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
                 <button class="check-option problem">Problema</button>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-item-label">Bateria e Partida</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Bateria e Partida</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
                 <button class="check-option problem">Problema</button>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-item-label">Faróis, Lanternas e Setas</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Faróis, Lanternas e Setas</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
@@ -194,24 +220,24 @@
         <div class="checklist-group">
           <div class="checklist-group-header">📑 Documentação & Pneus</div>
           <div class="checklist-items">
-            <div class="checklist-item">
-              <span class="checklist-item-label">CRLV e IPVA</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">CRLV e IPVA</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
                 <button class="check-option problem">Problema</button>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-item-label">Histórico de Leilão/Sinistro</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Histórico de Leilão/Sinistro</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
                 <button class="check-option problem">Problema</button>
               </div>
             </div>
-            <div class="checklist-item">
-              <span class="checklist-item-label">Estado de Desgaste dos Pneus</span>
+            <div class="checklist-item vistoria-item">
+              <span class="checklist-item-label check-label">Estado de Desgaste dos Pneus</span>
               <div class="check-options">
                 <button class="check-option ok active">OK</button>
                 <button class="check-option atention">Atenção</button>
@@ -221,25 +247,39 @@
           </div>
         </div>
       </div>
+
+      <!-- Histórico de Vistorias -->
+      <div class="chart-card" style="margin-top: 24px;">
+        <div class="chart-card-header">
+          <h2 class="chart-title">Histórico de Vistorias</h2>
+          <div class="chart-subtitle">Últimas vistorias realizadas no sistema</div>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Veículo / Placa</th>
+                <th>Checklist</th>
+                <th>Status Geral</th>
+                <th>Observações</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="vistorias-tbody">
+              <tr>
+                <td colspan="6" class="text-center" style="padding:40px;color:var(--text-muted);">Carregando vistorias...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </main>
 </div>
 
 <script src="../js/app.js"></script>
+<script src="../js/db.js"></script>
 <script src="../js/dashboard.js"></script>
-<script>
-  // Profile loading and logout function
-  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
-  if (currentUser) {
-    document.getElementById('sidebar-user-name').textContent = currentUser.name;
-    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
-    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-  }
-
-  function logout() {
-    localStorage.removeItem('siscar_current_user');
-    window.location.href = 'login.html';
-  }
-</script>
 </body>
 </html>

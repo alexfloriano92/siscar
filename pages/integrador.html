@@ -121,7 +121,28 @@
           <h1>Integrador de Portais</h1>
           <p>Selecione em quais portais classificados de veículos deseja publicar seus anúncios automaticamente.</p>
         </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="btn-publish-all">🚀 Publicar em Massa</button>
+        </div>
       </header>
+
+      <!-- Stats Row -->
+      <div class="kpi-grid mb-24" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="kpi-card">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Anúncios Publicados</div>
+            <div class="kpi-value" id="portal-total-listings">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">👁️</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Visualizações Totais</div>
+            <div class="kpi-value" id="portal-total-views">0</div>
+          </div>
+        </div>
+      </div>
 
       <!-- Portals grid -->
       <div id="portals-container" class="portals-admin-grid">
@@ -136,20 +157,7 @@
 </div>
 
 <script src="../js/app.js"></script>
+<script src="../js/db.js"></script>
 <script src="../js/dashboard.js"></script>
-<script>
-  // Profile loading and logout function
-  const currentUser = JSON.parse(localStorage.getItem('siscar_current_user') || '{"name":"Admin Sistema","email":"admin@siscar.com","role":"admin"}');
-  if (currentUser) {
-    document.getElementById('sidebar-user-name').textContent = currentUser.name;
-    document.getElementById('sidebar-user-role').textContent = currentUser.role.toUpperCase();
-    document.getElementById('sidebar-user-avatar').textContent = currentUser.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-  }
-
-  function logout() {
-    localStorage.removeItem('siscar_current_user');
-    window.location.href = 'login.html';
-  }
-</script>
 </body>
 </html>
