@@ -709,13 +709,72 @@
 <div class="scroll-top" id="scroll-top" title="Voltar ao topo">↑</div>
 
 <script src="js/app.js"></script>
+<script src="js/db.js"></script>
 <script src="js/landing.js"></script>
 <script>
-  // CTA form
-  document.getElementById('cta-main-form')?.addEventListener('submit', (e) => {
+  // CTA form - Gerador de Trial SaaS
+  document.getElementById('cta-main-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    Toast.success('Cadastro realizado!', 'Em breve nossa equipe entrará em contato. 🎉');
-    e.target.reset();
+    const emailInput = e.target.querySelector('input[type="email"]');
+    const email = emailInput.value.trim();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = 'Criando ambiente... ⏳';
+    btn.disabled = true;
+
+    if (!window.SiscarDB) {
+      Toast.error('Erro', 'Banco de dados não carregado.');
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      return;
+    }
+
+    try {
+      const trial = await SiscarDB.registerTrialUser(email);
+      
+      if (!trial) {
+        Toast.warning('Aviso', 'Este e-mail já possui um trial ativo.');
+        setTimeout(() => { window.location.href = 'pages/login.html'; }, 1500);
+        return;
+      }
+
+      // Modal Moderno de Sucesso (Simulando envio de e-mail)
+      const modalHtml = `
+        <div id="trial-modal" class="modal-overlay active" style="z-index:9999;">
+          <div class="modal" style="max-width: 450px; text-align: center; padding: 32px 24px;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🚀</div>
+            <h2 style="margin-bottom: 8px;">Ambiente Criado!</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem;">
+              Seu trial de 14 dias está pronto. Simulamos o envio de um e-mail com seus dados, 
+              mas para acessar imediatamente, use as credenciais abaixo:
+            </p>
+            <div style="background: rgba(0,0,0,0.03); padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: left; border: 1px solid rgba(0,0,0,0.05);">
+              <div style="margin-bottom: 8px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">E-mail</span><br>
+                <strong style="font-size: 1.1rem;">${trial.email}</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Senha</span><br>
+                <strong style="font-size: 1.1rem; color: var(--primary); letter-spacing: 2px;">${trial.password}</strong>
+              </div>
+            </div>
+            <button onclick="window.location.href='pages/login.html'" class="btn btn-primary w-full" style="justify-content:center;">
+              Acessar Painel Agora
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      e.target.reset();
+
+    } catch (err) {
+      console.error(err);
+      Toast.error('Erro', 'Ocorreu um erro ao gerar o seu trial.');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
   });
 </script>
 </body>

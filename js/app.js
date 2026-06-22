@@ -233,6 +233,19 @@ const Dashboard = {
     if (avatarEl) avatarEl.textContent = Utils.getInitials(user.name);
     if (welcomeEl) welcomeEl.textContent = user.name.split(' ')[0];
 
+    // Melhorando a visibilidade do botão de logout
+    const logoutBtn = document.querySelector('.user-logout');
+    if (logoutBtn) {
+      logoutBtn.innerHTML = '🚪 Sair';
+      logoutBtn.style.cursor = 'pointer';
+      logoutBtn.style.fontSize = '0.9rem';
+      logoutBtn.style.color = 'var(--danger)';
+      logoutBtn.style.fontWeight = '600';
+      logoutBtn.style.display = 'flex';
+      logoutBtn.style.alignItems = 'center';
+      logoutBtn.style.gap = '4px';
+    }
+
     // Store info from DB
     if (window.SiscarDB) {
       SiscarDB.getConfig().then(cfg => {
@@ -246,8 +259,9 @@ const Dashboard = {
 /* ── Logout ─────────────────────────────────────────────────────── */
 window.logout = function() {
   if (window.Auth) Auth.clearSession();
+  localStorage.removeItem('siscar_session');
   localStorage.removeItem('siscar_current_user');
-  // Detect if we are already at root or inside pages/
+  // Detect se está em pages ou na raiz
   const inPages = window.location.pathname.includes('/pages/');
   window.location.href = inPages ? 'login.html' : 'pages/login.html';
 };

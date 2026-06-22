@@ -100,12 +100,17 @@
     // Wait for DB
     const tryLogin = async () => {
       const user = await SiscarDB.loginUser(email, password);
-      if (user) {
+      if (user && !user.error) {
         Auth.setSession(user);
         // Legacy support
         localStorage.setItem('siscar_current_user', JSON.stringify({ name: user.name, email: user.email, role: user.role }));
         Toast.success('Login realizado!', `Bem-vindo, ${user.name}! 🎉`);
         setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+      } else if (user && user.error === 'expired') {
+        btn.disabled = false;
+        btnText.textContent = 'Entrar no Painel 🚀';
+        errorEl.style.display = 'block';
+        errorMsg.textContent = 'Seu período de teste de 14 dias expirou. Assine um plano.';
       } else {
         btn.disabled = false;
         btnText.textContent = 'Entrar no Painel 🚀';

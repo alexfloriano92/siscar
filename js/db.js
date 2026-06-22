@@ -371,8 +371,35 @@
       if (!user) return null;
       if (!verifyPassword(password, user.passwordHash)) return null;
       if (!user.active) return null;
+      
+      // Verifica expiração de Trial
+      if (user.expiresAt && new Date() > new Date(user.expiresAt)) {
+        return { error: 'expired' };
+      }
+
       await db.users.update(user.id, { lastLogin: new Date().toLocaleString('pt-BR') });
       return user;
+    },
+
+    /* ── SaaS Trial Generation ───────────────────────────────── */
+    async registerTrialUser(email) {
+      const existing = await SiscarDB.getUserByEmail(email);
+      if (existing) return null; // já existe
+
+      const randomPass = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+      
+      const user = {
+        name: email.split('@')[0],
+        email: email.toLowerCase(),
+        role: 'admin', // Full access trial
+        active: true,
+        expiresAt: expiresAt,
+        permissions: { estoque: true, clientes: true, vendas: true, financeiro: true, contratos: true, avaliacoes: true, vistoria: true, integrador: true, relatorios: true, configuracoes: true, usuarios: true }
+      };
+      
+      const id = await SiscarDB.addUser({ ...user, password: randomPass });
+      return { id, email, password: randomPass, expiresAt };
     },
 
     /* ── Contracts ───────────────────────────────────────────── */
