@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Siscar — Login</title>
+  <title>Login — Siscar</title>
   <meta name="description" content="Acesse o painel do Siscar para gerenciar sua loja de veículos.">
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/dashboard.css">
@@ -15,20 +15,35 @@
   <div class="login-grid"></div>
 
   <div class="login-card">
+    <!-- Logo / Branding da Loja -->
     <a href="../index.html" class="login-logo">
-      <div class="logo-icon">🚗</div>
-      <span>Sis<span style="color:var(--primary)">car</span></span>
+      <div class="logo-icon" id="store-logo-icon">🚗</div>
+      <span id="store-brand-name">Sis<span style="color:var(--primary)">car</span></span>
     </a>
 
-    <h2 class="login-title">Seja bem-vindo de volta!</h2>
-    <p class="login-subtitle">Acesse sua conta para gerenciar seu estoque e vendas.</p>
+    <!-- Indicador da loja (para lojas específicas) -->
+    <div id="store-badge" style="display:none; text-align:center; margin-bottom:16px;">
+      <div style="display:inline-flex; align-items:center; gap:8px; padding:6px 14px; background:rgba(226,36,70,0.08); border:1px solid rgba(226,36,70,0.2); border-radius:20px; font-size:0.82rem; color:var(--primary);">
+        <span>🏪</span>
+        <span id="store-name-badge">Carregando...</span>
+      </div>
+    </div>
+
+    <h2 class="login-title">Seja bem-vindo!</h2>
+    <p class="login-subtitle" id="login-subtitle">Acesse sua conta para gerenciar seu estoque e vendas.</p>
+
+    <!-- Aviso de servidor offline -->
+    <div id="offline-warning" style="display:none; padding:12px 16px; background:rgba(255,180,0,0.12); border:1px solid rgba(255,180,0,0.4); border-radius:8px; color:#b8860b; font-size:0.85rem; margin-bottom:16px;">
+      ⚠️ <strong>Servidor offline.</strong> Inicie o backend:<br>
+      <code style="font-size:0.8rem;">backend\iniciar.bat</code>
+    </div>
 
     <form class="login-form" id="login-form">
       <div class="form-group">
         <label class="form-label" for="login-email">E-mail</label>
         <div class="form-input-wrap">
           <span class="form-input-icon">📧</span>
-          <input type="email" id="login-email" class="form-input" placeholder="seuemail@exemplo.com" required value="admin@siscar.com">
+          <input type="email" id="login-email" class="form-input" placeholder="seuemail@exemplo.com" required autocomplete="username">
         </div>
       </div>
 
@@ -39,14 +54,14 @@
         </div>
         <div class="form-input-wrap">
           <span class="form-input-icon">🔒</span>
-          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required value="123456">
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
           <span class="form-input-icon" id="toggle-password" style="cursor:pointer;right:0;left:auto;padding-right:12px;" onclick="togglePasswordVisibility()">👁</span>
         </div>
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
         <input type="checkbox" id="remember-me" style="width:16px;height:16px;cursor:pointer;">
-        <label for="remember-me" style="font-size:0.85rem;color:var(--text-secondary);cursor:pointer;">Lembrar-me por 30 dias</label>
+        <label for="remember-me" style="font-size:0.85rem;color:var(--text-secondary);cursor:pointer;">Lembrar-me</label>
       </div>
 
       <div id="login-error" style="display:none;padding:10px 14px;background:rgba(226,36,70,0.1);border:1px solid rgba(226,36,70,0.3);border-radius:8px;color:#E22446;font-size:0.85rem;margin-bottom:12px;">
@@ -58,11 +73,12 @@
       </button>
     </form>
 
-    <div style="margin-top: 24px;">
+    <!-- Quick login demo (só aparece na loja demo) -->
+    <div id="demo-logins" style="display:none; margin-top: 24px;">
       <div class="login-divider">ou acesse como demonstração</div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px;">
-        <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('carlos@siscar.com')">🔑 Vendedor</button>
-        <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('joao@siscar.com')">🔑 Gerente</button>
+        <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('admin@demo.com')">🔑 Admin</button>
+        <button class="btn btn-secondary btn-sm" style="justify-content:center;" onclick="quickLogin('carlos@demo.com')">🔑 Vendedor</button>
       </div>
     </div>
 
@@ -73,76 +89,103 @@
 </div>
 
 <script src="../js/app.js"></script>
-<script src="../js/db.js"></script>
+<script src="../js/api.js"></script>
 <script>
-  // Se já tem sessão, redireciona
-  window.addEventListener('siscar-db-ready', async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const lojaSlug = urlParams.get('loja') || 'demo';
+  let tenantInfo = null;
+
+  // Carrega informações da loja
+  async function loadTenantInfo(slug) {
+    try {
+      tenantInfo = await SiscarAPI.getTenantInfo(slug);
+      if (tenantInfo) {
+        document.getElementById('store-name-badge').textContent = tenantInfo.name;
+        document.getElementById('store-badge').style.display = 'block';
+        document.title = `Login — ${tenantInfo.name}`;
+        document.getElementById('login-subtitle').textContent = `Acesse o painel de ${tenantInfo.name}`;
+        if (tenantInfo.logo) {
+          document.getElementById('store-logo-icon').innerHTML = `<img src="${tenantInfo.logo}" style="height:32px;object-fit:contain;" alt="">`;
+        }
+      }
+    } catch { /* loja não encontrada ou demo */ }
+  }
+
+  // Detecta estado inicial após API pronta
+  window.addEventListener('siscar-db-ready', async (e) => {
+    const offline = e.detail?.offline;
+    if (offline) {
+      document.getElementById('offline-warning').style.display = 'block';
+      return;
+    }
+
+    // Se já tem sessão válida, redireciona para dashboard
     const session = Auth.getSession();
-    if (session) {
+    const token = Auth.getToken();
+    if (session && token && !Auth.isExpired()) {
       window.location.href = 'dashboard.html';
       return;
     }
+
+    // Carrega info da loja
+    await loadTenantInfo(lojaSlug);
+
+    // Mostra quick logins só na demo
+    if (lojaSlug === 'demo') {
+      document.getElementById('demo-logins').style.display = 'block';
+    }
   });
 
+  // Form de login
   document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email')?.value?.trim()?.toLowerCase();
+    const email    = document.getElementById('login-email')?.value?.trim()?.toLowerCase();
     const password = document.getElementById('login-password')?.value;
-    const btn = document.getElementById('btn-login');
-    const btnText = document.getElementById('login-btn-text');
-    const errorEl = document.getElementById('login-error');
+    const btn      = document.getElementById('btn-login');
+    const btnText  = document.getElementById('login-btn-text');
+    const errorEl  = document.getElementById('login-error');
     const errorMsg = document.getElementById('login-error-msg');
 
-    btn.disabled = true;
+    btn.disabled   = true;
     btnText.textContent = 'Entrando...';
     errorEl.style.display = 'none';
 
-    // Wait for DB
-    const tryLogin = async () => {
-      const user = await SiscarDB.loginUser(email, password);
-      if (user && !user.error) {
-        Auth.setSession(user);
-        // Legacy support
-        localStorage.setItem('siscar_current_user', JSON.stringify({ name: user.name, email: user.email, role: user.role }));
-        Toast.success('Login realizado!', `Bem-vindo, ${user.name}! 🎉`);
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-      } else if (user && user.error === 'expired') {
-        btn.disabled = false;
-        btnText.textContent = 'Entrar no Painel 🚀';
-        errorEl.style.display = 'block';
-        errorMsg.textContent = 'Seu período de teste de 14 dias expirou. Assine um plano.';
+    try {
+      const data = await SiscarAPI.login(email, password, lojaSlug);
+      Toast.success('Login realizado!', `Bem-vindo, ${data.user.name}! 🎉`);
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+    } catch (err) {
+      errorEl.style.display = 'block';
+      if (err.message?.includes('expirado') || err.message?.includes('PLAN_EXPIRED')) {
+        errorMsg.textContent = 'Seu plano expirou. Renove sua assinatura para continuar.';
+      } else if (err.message?.includes('offline') || err.message?.includes('Servidor')) {
+        document.getElementById('offline-warning').style.display = 'block';
+        errorEl.style.display = 'none';
       } else {
-        btn.disabled = false;
-        btnText.textContent = 'Entrar no Painel 🚀';
-        errorEl.style.display = 'block';
         errorMsg.textContent = 'E-mail ou senha inválidos. Verifique e tente novamente.';
       }
-    };
-
-    if (window.SiscarDB) {
-      await tryLogin();
-    } else {
-      window.addEventListener('siscar-db-ready', tryLogin, { once: true });
+      btn.disabled = false;
+      btnText.textContent = 'Entrar no Painel 🚀';
     }
   });
 
   function quickLogin(email) {
     const emailInput = document.getElementById('login-email');
-    const passInput = document.getElementById('login-password');
+    const passInput  = document.getElementById('login-password');
     if (emailInput && passInput) {
       emailInput.value = email;
-      passInput.value = '123456';
+      passInput.value  = '123456';
       document.getElementById('login-form').dispatchEvent(new Event('submit'));
     }
   }
 
   function togglePasswordVisibility() {
     const passInput = document.getElementById('login-password');
-    passInput.type = passInput.type === 'password' ? 'text' : 'password';
+    passInput.type  = passInput.type === 'password' ? 'text' : 'password';
   }
 
   document.getElementById('forgot-password')?.addEventListener('click', () => {
-    Toast.info('Recuperação de Senha', 'Entre em contato: contato@siscar.com.br ou (11) 99999-9999');
+    Toast.info('Recuperação de Senha', 'Entre em contato: contato@siscar.com.br');
   });
 </script>
 </body>

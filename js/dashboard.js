@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   SISCAR — DASHBOARD.JS — All admin module logic (async/IndexedDB)
+   SISCAR — DASHBOARD.JS v2.0 — Multi-Tenant SaaS
+   Usa SiscarAPI (api.js) que é retrocompatível com SiscarDB
    ═══════════════════════════════════════════════════════════════ */
 
 function waitDB(fn) {
@@ -9,6 +10,12 @@ function waitDB(fn) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
+
+  // Guarda de autenticação global — todas as páginas do painel
+  if (window.Auth && !Auth.getSession() && page) {
+    window.location.href = '../pages/login.html';
+    return;
+  }
 
   const pageInit = {
     dashboard:     () => waitDB(initDashboard),
@@ -32,20 +39,54 @@ document.addEventListener('DOMContentLoaded', () => {
 /* DASHBOARD PAGE                                                  */
 /* ══════════════════════════════════════════════════════════════ */
 async function initDashboard() {
-  const stats = await SiscarDB.getDashboardStats();
-  renderKPIs(stats);
-  renderSalesChart(stats);
-  renderStockChart(stats);
-  renderActivity();
-  renderTopVehicles(stats);
+  // Atualiza saudação com nome do usuário logado
+  const session = window.Auth?.getSession?.();
+  if (session) {
+    const welcomeEl = document.getElementById('welcome-name');
+    if (welcomeEl) welcomeEl.textContent = session.user?.name?.split(' ')[0] || 'Admin';
+    const breadcrumb = document.querySelector('.breadcrumb a');
+    if (breadcrumb) breadcrumb.textContent = session.user?.name || 'Admin';
+  }
+
+  try {
+    const stats = await SiscarDB.getDashboardStats();
+    renderKPIs(stats);
+    renderSalesChart(stats);
+    renderStockChart(stats);
+    renderActivity(stats);
+    renderTopVehicles(stats);
+  } catch (err) {
+    console.error('[Dashboard] Erro ao carregar stats:', err);
+    if (window.Toast) Toast.error('Erro', 'Falha ao carregar dados. ' + (err.message || ''));
+  }
 }
 
 function renderKPIs(stats) {
   const kpis = [
-    { label: 'Veículos em Estoque', value: Utils.formatNumber(stats.counts.disponivel + stats.counts.reservado), change: `${stats.counts.disponivel} disponíveis`, changeType: 'up', icon: '🚗', iconBg: 'rgba(74,157,255,0.15)', iconColor: '#4A9DFF' },
-    { label: 'Vendas Registradas', value: stats.salesCount, change: `${stats.counts.vendido} vendidos`, changeType: 'up', icon: '💰', iconBg: 'rgba(0,200,150,0.15)', iconColor: '#00C896' },
-    { label: 'Receita Total', value: Utils.formatCurrency(stats.totalReceitas), change: `Saldo: ${Utils.formatCurrency(stats.saldo)}`, changeType: 'up', icon: '📈', iconBg: 'rgba(226,36,70,0.15)', iconColor: '#E22446' },
-    { label: 'Lucro Médio/Veículo', value: Utils.formatCurrency(stats.avgProfit), change: `Estoque: ${Utils.formatCurrency(stats.stockValue)}`, changeType: 'up', icon: '⭐', iconBg: 'rgba(255,179,0,0.15)', iconColor: '#FFB300' },
+    {
+      label: 'Veículos em Estoque',
+      value: Utils.formatNumber((stats.counts?.disponivel || 0) + (stats.counts?.reservado || 0)),
+      change: `${stats.counts?.disponivel || 0} disponíveis`,
+      changeType: 'up', icon: '🚗', iconBg: 'rgba(74,157,255,0.15)', iconColor: '#4A9DFF'
+    },
+    {
+      label: 'Vendas no Mês',
+      value: stats.monthlySalesCount || stats.salesCount || 0,
+      change: Utils.formatCurrency(stats.monthlySalesTotal || stats.totalReceitas || 0),
+      changeType: 'up', icon: '💰', iconBg: 'rgba(0,200,150,0.15)', iconColor: '#00C896'
+    },
+    {
+      label: 'Receita do Mês',
+      value: Utils.formatCurrency(stats.monthReceitas || stats.totalReceitas || 0),
+      change: `Saldo: ${Utils.formatCurrency(stats.monthSaldo || stats.saldo || 0)}`,
+      changeType: 'up', icon: '📈', iconBg: 'rgba(226,36,70,0.15)', iconColor: '#E22446'
+    },
+    {
+      label: 'Lucro Médio/Veículo',
+      value: Utils.formatCurrency(stats.avgProfit || 0),
+      change: `Estoque: ${Utils.formatCurrency(stats.stockValue || 0)}`,
+      changeType: 'up', icon: '⭐', iconBg: 'rgba(255,179,0,0.15)', iconColor: '#FFB300'
+    },
   ];
 
   const container = document.getElementById('kpi-grid');
@@ -67,20 +108,22 @@ function renderSalesChart(stats) {
   const canvas = document.getElementById('sales-chart');
   if (!canvas || !window.Chart) return;
 
-  // Agrupa vendas por mês
-  const monthData = {};
-  const revData = {};
-  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  stats.sales.forEach(s => {
-    if (!s.date) return;
-    const m = parseInt(s.date.split('-')[1]) - 1;
-    monthData[m] = (monthData[m] || 0) + 1;
-    revData[m] = (revData[m] || 0) + s.salePrice;
-  });
+  let labels, rev;
 
-  const labels = months.slice(0, new Date().getMonth() + 1);
-  const data = labels.map((_, i) => monthData[i] || 0);
-  const rev = labels.map((_, i) => revData[i] || 0);
+  if (stats.chartData && stats.chartData.length > 0) {
+    labels = stats.chartData.map(d => d.month);
+    rev    = stats.chartData.map(d => d.total);
+  } else {
+    const revData = {};
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    (stats.sales || []).forEach(s => {
+      if (!s.date) return;
+      const m = parseInt(s.date.split('-')[1]) - 1;
+      revData[m] = (revData[m] || 0) + (s.sale_price || s.salePrice || 0);
+    });
+    labels = months.slice(0, new Date().getMonth() + 1);
+    rev    = labels.map((_, i) => revData[i] || 0);
+  }
 
   if (canvas._chart) canvas._chart.destroy();
   canvas._chart = new Chart(canvas, {
@@ -88,8 +131,8 @@ function renderSalesChart(stats) {
     data: {
       labels,
       datasets: [
-        { label: 'Vendas', data, backgroundColor: 'rgba(226,36,70,0.7)', borderRadius: 6, yAxisID: 'y' },
-        { label: 'Receita (R$)', data: rev, type: 'line', borderColor: '#4A9DFF', backgroundColor: 'rgba(74,157,255,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#4A9DFF', tension: 0.4, fill: true, yAxisID: 'y1' }
+        { label: 'Receita (R$)', data: rev, backgroundColor: 'rgba(226,36,70,0.75)', borderRadius: 8, yAxisID: 'y' },
+        { label: 'Tendência', data: rev, type: 'line', borderColor: '#4A9DFF', backgroundColor: 'rgba(74,157,255,0.08)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#4A9DFF', tension: 0.4, fill: true, yAxisID: 'y' }
       ]
     },
     options: {
@@ -101,8 +144,7 @@ function renderSalesChart(stats) {
       },
       scales: {
         x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748B' } },
-        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748B' }, position: 'left' },
-        y1: { grid: { drawOnChartArea: false }, ticks: { color: '#64748B', callback: v => 'R$ ' + (v/1000) + 'k' }, position: 'right' }
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748B', callback: v => 'R$ ' + (v/1000).toFixed(0) + 'k' } },
       }
     }
   });
@@ -112,17 +154,16 @@ function renderStockChart(stats) {
   const canvas = document.getElementById('stock-chart');
   if (!canvas || !window.Chart) return;
 
-  const categories = {};
-  stats.vehicles.forEach(v => {
-    if (v.status !== 'vendido') categories[v.category] = (categories[v.category] || 0) + 1;
-  });
+  const counts = stats.counts || {};
+  const labels = ['Disponível', 'Reservado', 'Vendido'];
+  const data   = [counts.disponivel || 0, counts.reservado || 0, counts.vendido || 0];
 
   if (canvas._chart) canvas._chart.destroy();
   canvas._chart = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: Object.keys(categories),
-      datasets: [{ data: Object.values(categories), backgroundColor: ['#E22446', '#4A9DFF', '#00C896', '#FFB300', '#9B59B6'], borderColor: 'transparent', borderWidth: 0, hoverOffset: 8 }]
+      labels,
+      datasets: [{ data, backgroundColor: ['#00C896', '#FFB300', '#4A9DFF'], borderColor: 'transparent', borderWidth: 0, hoverOffset: 8 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '70%',
@@ -134,18 +175,20 @@ function renderStockChart(stats) {
   });
 }
 
-async function renderActivity() {
+async function renderActivity(stats) {
   const container = document.getElementById('activity-list');
   if (!container) return;
-  const activities = await SiscarDB.getActivities(8);
-  const typeIcons = { sale: '💰', client: '👤', evaluation: '⭐', portal: '🌐', contract: '📄', vistoria: '🔍', vehicle: '🚗', user: '👤', system: 'ℹ️' };
-  const typeColors = { sale: '#00C896', client: '#4A9DFF', evaluation: '#FFB300', portal: '#E22446', contract: '#9B59B6', vistoria: '#00C896', vehicle: '#4A9DFF', user: '#FFB300', system: '#64748B' };
+
+  const activities = stats?.recentActivities || [];
+  const typeIcons  = { sale: '💰', client: '👤', evaluation: '⭐', portal: '🌐', contract: '📄', vistoria: '🔍', vehicle: '🚗', user: '👤', system: 'ℹ️', financial: '📊', config: '⚙️' };
+  const typeColors = { sale: '#00C896', client: '#4A9DFF', evaluation: '#FFB300', portal: '#E22446', contract: '#9B59B6', vistoria: '#00C896', vehicle: '#4A9DFF', user: '#FFB300', system: '#64748B', financial: '#FF6600', config: '#64748B' };
+
   container.innerHTML = activities.map(a => `
     <div class="activity-item">
       <div class="activity-dot" style="background:${typeColors[a.type] || '#64748B'};"></div>
       <div class="activity-content">
         <div class="activity-text">${typeIcons[a.type] || 'ℹ️'} ${Utils.safe(a.text)}</div>
-        <div class="activity-time">${Utils.formatRelative(a.createdAt)}</div>
+        <div class="activity-time">${Utils.formatRelative(a.created_at || a.createdAt)}</div>
       </div>
     </div>
   `).join('') || '<p style="color:var(--text-muted);padding:16px;">Nenhuma atividade registrada.</p>';
@@ -154,12 +197,6 @@ async function renderActivity() {
 async function renderTopVehicles(stats) {
   const container = document.getElementById('top-vehicles');
   if (!container) return;
-  const vehicles = stats.vehicles.filter(v => v.status !== 'vendido').slice(0, 5);
-  container.innerHTML = vehicles.map(v => `
-    <div class="activity-item">
-      <div style="font-size:1.4rem;">${Utils.getCategoryIcon(v.category)}</div>
-      <div class="activity-content">
-        <div class="activity-text">${Utils.safe(v.brand)} ${Utils.safe(v.model)} ${v.year}</div>
         <div class="activity-time">${Utils.formatCurrency(v.salePrice)} • ${Utils.formatKm(v.km)}</div>
       </div>
       ${Utils.getStatusBadge(v.status)}
